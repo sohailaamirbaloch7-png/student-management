@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Management System</title>
+<style>
+body{font-family:Arial;background:#eef2ff;margin:0;padding:25px}
+.container{max-width:750px;margin:auto;background:white;padding:20px;border-radius:12px}
+h1{text-align:center;color:#2563eb}
+input,button{padding:10px;margin:5px 0;border:1px solid #ccc;border-radius:5px}
+input{box-sizing:border-box;width:100%}
+button{background:#2563eb;color:white;border:0;cursor:pointer}
+.delete{background:#dc2626}
+table{width:100%;margin-top:20px;border-collapse:collapse}
+th,td{padding:10px;border:1px solid #ddd;text-align:left}
+@media(max-width:550px){.container{padding:12px}table{font-size:12px}th,td{padding:5px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Student Management</h1>
+
+<form id="form">
+<input id="name" placeholder="Student Name" required>
+<input id="roll" placeholder="Roll Number" required>
+<input id="course" placeholder="Course Name" required>
+<button type="submit">Add Student</button>
+</form>
+
+<input id="search" placeholder="Search students...">
+
+<table>
+<thead>
+<tr><th>Name</th><th>Roll No.</th><th>Course</th><th>Action</th></tr>
+</thead>
+<tbody id="list"></tbody>
+</table>
+</div>
+
+<script>
+let students=JSON.parse(localStorage.getItem("students")||"[]");
+const form=document.getElementById("form");
+const list=document.getElementById("list");
+
+function show(){
+let q=document.getElementById("search").value.toLowerCase();
+list.innerHTML="";
+students.forEach((s,i)=>{
+if((s.name+" "+s.roll+" "+s.course).toLowerCase().includes(q)){
+let tr=document.createElement("tr");
+[s.name,s.roll,s.course].forEach(value=>{
+let td=document.createElement("td");
+td.textContent=value;
+tr.appendChild(td);
+});
+let td=document.createElement("td");
+let btn=document.createElement("button");
+btn.textContent="Delete";
+btn.className="delete";
+btn.onclick=()=>{students.splice(i,1);save()};
+td.appendChild(btn);
+tr.appendChild(td);
+list.appendChild(tr);
+}
+});
+}
+
+function save(){
+localStorage.setItem("students",JSON.stringify(students));
+show();
+}
+
+form.onsubmit=e=>{
+e.preventDefault();
+let name=document.getElementById("name").value.trim();
+let roll=document.getElementById("roll").value.trim();
+let course=document.getElementById("course").value.trim();
+
+if(students.some(s=>s.roll.toLowerCase()===roll.toLowerCase())){
+alert("Roll number already exists!");
+return;
+}
+students.push({name,roll,course});
+save();
+form.reset();
+};
+
+document.getElementById("search").oninput=show;
+show();
+</script>
+</body>
+</html>
